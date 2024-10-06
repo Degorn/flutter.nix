@@ -60,6 +60,7 @@ let
     name = "flutter-cache-dir";
     paths = builtins.attrValues flutterPlatformArtifacts;
     postBuild = ''
+      rm -rf "$out/bin/cache/dart-sdk"
       mkdir -p "$out/bin/cache"
       ln -s '${flutter}/bin/cache/dart-sdk' "$out/bin/cache"
     '';

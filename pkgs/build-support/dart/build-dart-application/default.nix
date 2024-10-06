@@ -9,13 +9,29 @@
 , nodejs
 , darwin
 , jq
+, runCommand
+, flutter
 }:
 
 { src
 , sourceRoot ? "source"
 , packageRoot ? (lib.removePrefix "/" (lib.removePrefix "source" sourceRoot))
 , gitHashes ? { }
-, sdkSourceBuilders ? { }
+, sdkSourceBuilders ? {
+    "dart" = name: runCommand "dart-sdk-${name}" { passthru.packageRoot = "."; } ''
+      for path in '${flutter.dart}/pkg/${name}'; do
+        if [ -d "$path" ]; then
+          ln -s "$path" "$out"
+          break
+        fi
+      done
+
+      if [ ! -e "$out" ]; then
+        echo 1>&2 'The Dart SDK does not contain the requested package: ${name}!'
+        exit 1
+      fi
+    '';
+}
 , customSourceBuilders ? { }
 
 , sdkSetupScript ? ""
